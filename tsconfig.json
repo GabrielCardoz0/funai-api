@@ -1,0 +1,21 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "es2018", // ou uma versão mais recente, como es2020
+    "module": "commonjs",
+    "lib": ["es2018"], // ou uma versão mais recente
+    "outDir": "./dist", // Onde os arquivos compilados (JavaScript) serão gerados
+    "rootDir": "./src", // Onde seus arquivos TypeScript estarão
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true // Permite importar arquivos JSON
+  },
+  "include": [
+    "src/**/*" // Inclui todos os arquivos dentro da pasta src, sem exceções
+  ],
+  "exclude": [
+    "node_modules" // Exclui a pasta node_modules da compilação
+  ]
+}

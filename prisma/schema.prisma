@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id              Int           @id @default(autoincrement())
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?     @db.Timestamp(6)
+  email           String
+  name            String
+  password        String
+  tax_id          String?
+  tax_type        String?
+  stripe_id       String?
+  image           String?
+  is_first_access Boolean       @default(true)
+  is_deleted      Boolean       @default(false)
+  is_blocked      Boolean       @default(false)
+  subscription_id Int
+  agents          agents[]
+  subscription    subscriptions @relation(fields: [subscription_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "users_fk1")
+}
+
+model agents {
+  id                    Int                @id @default(autoincrement())
+  created_at            DateTime           @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?          @db.Timestamp(6)
+  name                  String
+  description           String
+  agent_name            String
+  agent_behavior        String
+  user_id               Int
+  image                 String?
+  business_description  String
+  is_active             Boolean            @default(true)
+  user                  users              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "agents_fk1")
+  black_list       black_lists[]
+  files            files[]
+  instances        instances[]
+  knowledge_chunks knowledge_chunks[]
+  white_list       white_lists[]
+}
+
+model instances {
+  id             Int       @id @default(autoincrement())
+  created_at     DateTime  @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @db.Timestamp(6)
+  agent_id       Int
+  integration_id String?
+  name           String?
+  type           String
+  is_connected   Boolean   @default(false)
+  is_disable     Boolean   @default(false)
+  agent          agents    @relation(fields: [agent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "instances_fk1")
+}
+
+model files {
+  id               Int                @id @default(autoincrement())
+  created_at       DateTime           @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @db.Timestamp(6)
+  fieldname        String
+  originalname     String
+  encoding         String
+  mimetype         String
+  destination      String
+  filename         String
+  path             String
+  size             Int
+  agent_id         Int
+  agent            agents             @relation(fields: [agent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "files_fk1")
+  knowledge_chunks knowledge_chunks[]
+}
+
+model black_lists {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  type       String
+  contact    String
+  agent_id   Int
+  agent      agents    @relation(fields: [agent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "black_lists_fk1")
+}
+
+model white_lists {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  type       String
+  contact    String
+  agent_id   Int
+  agent      agents    @relation(fields: [agent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "white_lists_fk1")
+}
+
+model knowledge_chunks {
+  id          Int                    @id @default(autoincrement())
+  source_file String?
+  chunk_index Int?
+  content     String?
+  agent_id    Int?
+  file_id     Int?
+  embedding   Unsupported("vector")?
+  agent       agents?                @relation(fields: [agent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "knowledge_chunks_fk1")
+  file        files?                 @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "knowledge_chunks_fk2")
+}
+
+model plans {
+  id                Int             @id @default(autoincrement())
+  created_at        DateTime        @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?       @db.Timestamp(6)
+  stripe_id         String?
+  name              String
+  description       String
+  price             Int
+  agents_limit      Int
+  instances_limit   Int
+  messages_limit    Int
+  dashboard_type    String
+  subscriptions     subscriptions[]
+}
+
+model subscriptions {
+  id                    Int        @id @default(autoincrement())
+  created_at            DateTime   @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?  @db.Timestamp(6)
+  canceled_at           DateTime?  @db.Timestamp(6)
+  cancel_at_period_end  Boolean    @default(false)
+  stripe_id             String
+  plan_id               Int
+  status                String?
+  agents_limit          Int
+  instances_limit       Int
+  messages_limit        Int
+  dashboard_type        String
+  invoices              invoices[]
+  plan                  plans      @relation(fields: [plan_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "subscriptions_fk1")
+  user                  users[]
+}
+
+model invoices {
+  id              Int           @id @default(autoincrement())
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?     @db.Timestamp(6)
+  stripe_id       String
+  amount          Int
+  end             String
+  start           String
+  status          String
+  plan_name       String
+  subscription_id Int
+  subscription    subscriptions @relation(fields: [subscription_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "invoices_fk1")
+}
