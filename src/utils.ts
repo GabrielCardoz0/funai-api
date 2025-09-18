@@ -231,11 +231,7 @@ export const emailsTemplates = {
         <h2 class="header">⚠️ Problema no Pagamento</h2>
         <p>Olá, ${name},</p>
         <p>Tivemos um problema ao processar o pagamento da sua assinatura.</p>
-        <p>Para evitar a interrupção do seu acesso, pedimos que atualize seus dados de pagamento.</p>
-        
-        <div class="button-container">
-          <a class="button" href="${FRONT_URL}/billing">Atualizar Pagamento</a>
-        </div>
+        <p>Para evitar a interrupção do seu acesso, pedimos que entre em contato com nosso suporte.</p>
 
         <div class="footer">
           <p>Se precisar de ajuda, fale com nosso suporte (KUMO):</p>
